@@ -1,0 +1,10 @@
+.classpath
+.project
+
+*.jpg
+*.png
+*.gif
+
+info/
+build/
+.settings/
