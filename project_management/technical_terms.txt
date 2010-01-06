@@ -1,0 +1,4 @@
+caveat
+	let the reader be aware
+de facto
+	standard (but not legal)

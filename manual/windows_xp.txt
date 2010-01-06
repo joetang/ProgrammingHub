@@ -1,8 +1,19 @@
 [setup]
-	2 partition
+	2 partition (c: d:)
 	updates to latest version
 	[drivers]
 	[folder structure]
+	d:
+	mkdir <user>
+	cd <user>
+	mkdir backup
+	mkdir backup/burnt
+	mkdir bin
+	mkdir fiancial
+	mkdir personal
+	mkdir photo
+	mkdir workspaces
+	
 	[get files from backup]
 	[java]
 	[mysql]

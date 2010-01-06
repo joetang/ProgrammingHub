@@ -1,5 +1,15 @@
 [setup]
 	[folder structure]
+	mkdir <user>
+	cd <user>
+	mkdir backup
+	mkdir backup/burnt
+	mkdir bin
+	mkdir fiancial
+	mkdir personal
+	mkdir photo
+	mkdir workspaces
+	
 	[samba]
 	[java]
 	[mysql]
