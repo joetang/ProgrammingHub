@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ias" basedir="." default="main">
+	<property name="src.dir"			value="src" />
+	<property name="build.dir"			value="build" />
+	<property name="classes.dir"		value="${build.dir}/classes" />
+	<property name="distrib.dir"		value="${build.dir}/distrib" />
+	<property name="web-inf.dir"		value="web/WEB-INF" />
+	<property name="lib.dir"			value="lib" />
+	<property name="config.dir"			value="${web-inf.dir}/config" />
+	<property name="jar.dir"			value="${classes.dir}" />
+	<property name="compile.debug"		value="true" />
+	<property name="compile.encoding"	value="UTF-8"/>
+	<property name="lib.prefix"			value="ias" />
+	<property name="version.new"		value="1114" />
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}" includes="**/*.jar" />
+		<fileset dir="<location of servlet-api.jar>" includes="servlet-api.jar" />
+		<fileset dir="<location of mysql connector.jar>" includes="mysql-connector-java-5.0.3-bin.jar" />
+	</path>	
+
+	<target name="os.test">
+		<condition property="isWindows">
+			<os family="windows"/>
+		</condition>
+	</target>
+
+	<target name="checkWinCmdExist" depends="os.test" if="isWindows">
+		<property environment="env"/>
+		<condition property="path" value="${env.PATH}">
+			<isset property="env.PATH"/>
+		</condition>
+		<condition property="path" value="${env.Path}">
+			<isset property="env.Path"/>
+		</condition>
+		<fail unless="path" message="Failure: PATH/Path environment variable not found"/>
+		<condition property="isWinCmdExist">
+			<and>
+				<available type="file" filepath="${path}" file="grep.exe"/>
+				<available type="file" filepath="${path}" file="awk.exe"/>
+			</and>
+		</condition>
+	</target>
+	
+	<target name="getVersionIfWindows" depends="checkWinCmdExist" if="isWinCmdExist">
+		<exec executable="grep" outputproperty="tmp">
+			<arg value="-m1"/>
+			<arg value="/svn/"/>
+			<arg value=".svn/all-wcprops"/>
+		</exec>
+		<exec executable="awk" inputstring="${tmp}" outputproperty="version.new2">
+			<arg value="-F/"/>
+			<arg value="{print $6}"/>
+		</exec>
+	</target>
+
+	<target name="getVersionIfNotWindows" depends="os.test" unless="isWindows">
+		<exec executable="grep" outputproperty="tmp">
+			<arg value="-m1"/>
+			<arg value="revision="/>
+			<arg value=".svn/entries"/>
+		</exec>
+		<exec executable="sed" inputstring="${tmp}" outputproperty="version.new2">
+			<arg value="-e"/>
+			<arg value="s/[^0-9]//g"/>
+		</exec>
+	</target>
+
+	<target name="getVersion" depends="getVersionIfWindows,getVersionIfNotWindows">
+		<condition property="getVersionSuccess">
+			<isset property="version.new2"/>
+		</condition>
+	</target>
+	
+	<target name="hyphenVersion" depends="getVersion" if="getVersionSuccess">
+		<property name="version.suffix" value="-${version.new2}"/>
+	</target>
+	
+	<target name="emptyVersion" depends="getVersion" unless="getVersionSuccess">
+		<property name="version.suffix" value=""/>
+	</target>
+	
+	<target name="getVersionSuffix" depends="hyphenVersion,emptyVersion"/>
+	
+	<target name="getVersionBySvnversionIfWindows">
+		<exec executable="cmd" outputproperty="version.new2">
+			<arg value="/c"/>
+			<arg value="svnversion.bat"/>
+			<arg value="."/>
+		</exec>
+	</target>
+
+	<target name="getVersionBySvnversionIfNotWindows">
+		<exec executable="svnversion" outputproperty="version.new2">
+			<arg value="."/>
+		</exec>
+	</target>
+
+	<target name="clean">
+		<delete dir="${classes.dir}" />
+	</target>
+
+	<target name="main" depends="clean, getVersion, compile, compress" description="Main target">
+		<echo>
+		Building the ${lib.prefix}.jar file.
+		</echo>
+	</target>
+
+	<target name="compile" description="Compilation target">
+		<echo>
+		Compiling Website ...
+		</echo>
+		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${distrib.dir}" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" debug="${compile.debug}" encoding="${compile.encoding}" />
+		<copy todir="${classes.dir}" overwrite="true">
+			<fileset dir="${src.dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>		
+	</target>
+
+	<target name="compress" depends="getVersionSuffix" description="Compression target">
+		<jar destfile="${distrib.dir}/${lib.prefix}-auth${version.suffix}.jar"><!-- could be more than 1 jar -->
+			<fileset dir="${classes.dir}">
+				<include name="<classes to be compress, could be more than 1 include, e.g. com/example/** com/example/*.class>"/>
+			</fileset>
+		</jar>
+	</target>	
+</project>

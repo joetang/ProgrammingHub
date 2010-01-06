@@ -8,3 +8,4 @@
 	[chrome]
 	[latex]
 	[get files from backup]
+	[ant]

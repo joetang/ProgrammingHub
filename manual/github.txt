@@ -1,5 +1,6 @@
 [setup]
 	ssh-keygen -C "<email>" -t rsa
+	Use your own email address of course. Use the default file name (id_rsa) and provide a password. The generated key will be stored in your profile, e.g.: C:\Documents and Settings\YourNameHere\.ssh\ on XP or C:\Users\YourNameHere\.ssh\ on Vista.
 	git config --global user.name "<Name>"
 	git config
 
