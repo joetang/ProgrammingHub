@@ -11,3 +11,5 @@
 	?[Barcode Reade]
 	[apple daily]
 	[Power Manager]
+	[overclocker]
+		set to 256 when sleep
