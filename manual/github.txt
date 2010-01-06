@@ -7,7 +7,9 @@
 [init]
 	git init
 	
-	git commit -m "<comment>"
+	
+	
+[create]	
 	git remote add origin <git url>
 
 [clone]
@@ -16,6 +18,10 @@
 [add]
 	git add <filename>
 	git ignore <filename>
+	
+[delete]
+	git rm <filename>
 
 [commit]
+	git commit -m "<comment>"
 	git push
