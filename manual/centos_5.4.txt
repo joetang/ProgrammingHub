@@ -1,0 +1,8 @@
+[setup]
+	[folder structure]
+	[samba]
+	[java]
+	[mysql]
+	[tomcat]
+	[get files from backup]
+	[ant]
