@@ -1,0 +1,33 @@
+[setup]
+	2 partition
+	updates to latest version
+	[drivers]
+	[folder structure]
+	[get files from backup]
+	[java]
+	[mysql]
+	[filezilla]
+	[putty]
+	[eclipse]
+	[tomcat]
+	[kkbox]
+	[keepass]
+	[git]
+	[firefox]
+	[chrome]
+	[latex]
+	[hd tune]
+	?[speed limiter]
+	[diskkeeper]
+	[notepad++]
+	[hideoe]
+	[msn]
+	?[winmerge]
+	[winrar]
+	?[winscp]
+	[screenhunter]
+	?[appserv]
+	[crimson editor]
+	
+
+	

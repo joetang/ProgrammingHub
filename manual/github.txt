@@ -1,0 +1,20 @@
+[setup]
+	ssh-keygen -C "<email>" -t rsa
+	git config --global user.name "<Name>"
+	git config
+
+[init]
+	git init
+	
+	git commit -m "<comment>"
+	git remote add origin <git url>
+
+[clone]
+	git clone <git url>
+
+[add]
+	git add <filename>
+	git ignore <filename>
+
+[commit]
+	git push
