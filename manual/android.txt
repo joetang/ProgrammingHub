@@ -1,1 +1,13 @@
 [setup]
+
+	[taskiller]
+	?[task]
+	[bloomberg]
+	?[near location notifier]
+	[kkbox]
+	[Twidroid]
+	?[MobileDefense]
+	?[Nesoid]
+	?[Barcode Reade]
+	[apple daily]
+	[Power Manager]
