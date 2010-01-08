@@ -2,3 +2,8 @@ caveat
 	let the reader be aware
 de facto
 	standard (but not legal)
+Higher-order function
+	take one or more functions as an input
+	output a function
+FOSS
+	free and open source software
