@@ -1,0 +1,11 @@
+.validateError{
+	background-color:#FFEEDD;
+}
+
+.validateCorrect{
+background-color:#DDEEFF;
+}
+
+.validateDebug{
+	background-color:#FFCF00;
+}
