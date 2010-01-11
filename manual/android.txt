@@ -1,16 +1,19 @@
 [setup]
 
 	[taskiller]
-	?[task]
-	[bloomberg]
-	?[near location notifier]
+	[eray]
+	[agile stock]
+	[lime]
 	[kkbox]
 	[Twidroid]
+	[Profile changer]
+	
+	?[apple daily]
+	?[overclocker]
+		set to 256 when sleep
+	?[near location notifier]
 	?[MobileDefense]
 	?[Nesoid]
 	?[Barcode Reade]
-	[apple daily]
-	[Power Manager]
-	[overclocker]
-		set to 256 when sleep
-	[lime]
+
+[restore from root]
