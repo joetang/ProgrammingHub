@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<beans>
+
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <bean id="defaultHandlerMapping" class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
+
+    <bean name="/index.do" class="com.model.mvc.web.main.MainController">
+        <property name="configuration" ref="configuration"/>
+        <property name="userService" ref="userService"/>
+        <property name="successView" value="main"/>
+    </bean>
+
+    <bean name="/json.do" class="com.model.mvc.web.main.JsonTestingController">
+        <property name="configuration" ref="configuration"/>
+    </bean>
+
+    <bean name="/login.do" class="com.model.mvc.web.main.LoginController">
+        <property name="configuration" ref="configuration"/>
+        <property name="successView" value="main"/>
+    </bean>
+
+    <bean id="registrationFormValidator" class="com.model.mvc.web.registration.form.RegistrationFormValidator"/>
+    <bean name="/registration.do" class="com.model.mvc.web.registration.RegistationController">
+        <property name="configuration" ref="configuration"/>
+        <property name="userService" ref="userService"/>
+        <property name="validator" ref="registrationFormValidator"/>
+        <property name="formView" value="registration/registrationForm"/>
+        <property name="successView" value="redirect:index.do"/>
+    </bean>
+
+
+    <bean id="secureHandlerMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="interceptors">
+            <list>
+                <ref bean="loginInterceptor"/>
+            </list>
+        </property>
+        <property name="urlMap">
+            <map>
+                <entry key="/myProfile.do" value-ref="profileController"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="profileController" class="com.model.mvc.web.main.ProfileController">
+        <property name="configuration" ref="configuration"/>
+        <property name="successView" value="profile/myProfile"/>
+    </bean>
+
+    <bean id="loginInterceptor" class="com.model.mvc.web.main.interceptor.LoginInterceptor"/>
+
+</beans>

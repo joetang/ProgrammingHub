@@ -5,6 +5,8 @@
 *.png
 *.gif
 
+*.jar
+
 info/
 build/
 .settings/
