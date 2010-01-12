@@ -1,0 +1,7 @@
+Test
+	Stress Test
+	Functional Test
+
+Agile
+
+Pair programming
