@@ -1,7 +1,14 @@
 Test
 	Stress Test
+		Throughput
+		No of thread to failure
 	Functional Test
-
+		Result meets expectation
+	Database reset
+		versioning database restore image
+	
 Agile
+	
 
 Pair programming
+	
