@@ -8,7 +8,9 @@ Test
 		versioning database restore image
 	
 Agile
-	
+	Scrum
+		a group of 5-9 people leaded by a PM (Scrum owner)
+	Timebox
 
 Pair programming
 	

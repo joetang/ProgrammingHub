@@ -1,24 +1,24 @@
 [setup]
 	1. linux text
 	2. Remove all partition
+	3. Server (No GUI)
 
-Server (No GUI)
+	mkdir /usr/java
 
-mkdir /usr/java
+	cd /usr/java
 
-cd /usr/java
+	curl -L -O 'http://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/VerifyItem-Start/jdk-6u17-linux-i586-rpm.bin?BundledLineItemUUID=crNIBe.p0PMAAAElgltUHPyQ&OrderID=5bhIBe.pwG8AAAEldltUHPyQ&ProductID=lBFIBe.oSOMAAAEkGehn5G0y&FileName=/jdk-6u17-linux-i586-rpm.bin'
 
-curl -L -O 'http://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/VerifyItem-Start/jdk-6u17-linux-i586-rpm.bin?BundledLineItemUUID=crNIBe.p0PMAAAElgltUHPyQ&OrderID=5bhIBe.pwG8AAAEldltUHPyQ&ProductID=lBFIBe.oSOMAAAEkGehn5G0y&FileName=/jdk-6u17-linux-i586-rpm.bin'
-
-vi /etc/profile
-export JAVA_HOME=/usr/java/jdk1.6.0_10
-export CLASSPATH=.:$JAVA_HOME/jre/lib/rt.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
-export PATH=$PATH:$JAVA_HOME/bin
-/etc/init.d/smb start
-service httpd start
+	vi /etc/profile
+	export JAVA_HOME=/usr/java/jdk1.6.0_10
+	export CLASSPATH=.:$JAVA_HOME/jre/lib/rt.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+	export PATH=$PATH:$JAVA_HOME/bin
+	/etc/init.d/smb start
+	service httpd start
 	3.
 	4.
 	[folder structure]
+	
 	[samba]
 	[java]
 	[mysql]

@@ -7,3 +7,11 @@ Higher-order function
 	output a function
 FOSS
 	free and open source software
+maven2
+	software project management and comprehensive tool
+ivy
+	dependency management tool
+ant
+	OS-independent build tool
+verbose
+	longer than necessary

@@ -7,6 +7,8 @@
 	mkdir <user>
 	cd <user>
 	mkdir backup
+	mkdir backup/
+	mkdir backup/secure
 	mkdir backup/burnt
 	mkdir bin
 	mkdir fiancial
