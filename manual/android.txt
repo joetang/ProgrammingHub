@@ -7,6 +7,8 @@
 	[kkbox]
 	[Twidroid]
 	[Profile changer]
+	[ConnectBot]
+	[Barcode Reader]
 	
 	?[apple daily]
 	?[overclocker]
@@ -14,6 +16,5 @@
 	?[near location notifier]
 	?[MobileDefense]
 	?[Nesoid]
-	?[Barcode Reade]
 
 [restore from root]
