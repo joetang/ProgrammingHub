@@ -21,6 +21,29 @@
 	[mysql]
 	[filezilla]
 	[putty]
+	[keepass]
+		Create ssh group
+		Create sftp/ftp group
+		Create website group
+		Tools -> Options -> Integration -> URL Schemes Overide
+			Update putty location for ssh
+				cmd://<location of putty>\PuTTY.exe -ssh {USERNAME}@{URL:RMVSCM} -pw {PASSWORD}
+			Add filezilla location for sftp and ftp
+				ftp: cmd://<location of putty>\PuTTY.exe ftp://{USERNAME}:{PASSWORD}@{URL:RMVSCM}
+				sftp: cmd://<location of filezilla>\filezilla.exe sftp://{USERNAME}:{PASSWORD}@{URL:RMVSCM}
+			Add for Google Chromes
+				chrome: cmd://{GOOGLECHROME} "http://{URL:RMVSCM}"
+				chromes: cmd://{GOOGLECHROME} "https://{URL:RMVSCM}"
+			Add for Firefox
+				firefox: cmd://{GOOGLECHROME} "http://{URL:RMVSCM}"
+				firefoxs: cmd://{GOOGLECHROME} "https://{URL:RMVSCM}"
+			Add for Internet Explorer
+				ie: cmd://{INTERNETEXPLORER} "http://{URL:RMVSCM}"
+				ies: cmd://{INTERNETEXPLORER} "https://{URL:RMVSCM}"
+			Add for Opera
+				opera: cmd://{OPERA} "http://{URL:RMVSCM}"
+				operas: cmd://{OPERA} "https://{URL:RMVSCM}"
+
 	[eclipse]
 	[tomcat]
 	[kkbox]
