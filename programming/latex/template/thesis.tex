@@ -1,0 +1,351 @@
+\documentclass[a4paper,dvips,11pt,oneside,onecolumn,final,openright]{book}
+
+%\title{Two studies on data integration: Integrating web services oriented data and Integrating remote databases on mobile devices}
+\title{Bridging Data Integration Technology and E-Commerce}
+%\title{Two studies on data integration: Integrating web services oriented data and joining remote relations on mobile devices}
+\author{Eric Chi-Lik \textsc{Lo}}
+\date{December 2003}
+
+
+%%----------------------------------------------------------------------------%%
+%%    Packages to include                                                     %%
+%%----------------------------------------------------------------------------%%
+
+% for general layout
+%\usepackage{times}
+\usepackage{thesisStyle}
+
+\usepackage{setspace}
+
+\usepackage{calc}
+\usepackage{tocbibind}
+\usepackage{indentfirst}
+\usepackage{fancyhdr}
+\usepackage{xspace}
+% for tables
+%\usepackage{array}
+%\usepackage{dcolumn}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{picinpar}
+
+% for maths
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{theorem}
+
+% for SI symbols
+%\usepackage[thinspace,amssymb]{SIunits}
+
+% for graphics
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage[tight,FIGBOTCAP,TABBOTCAP,hang]{subfigure}
+\usepackage{rotating}
+\usepackage{epsfig}
+
+% for algorithms
+\usepackage[plain,section]{algorithm}
+\usepackage{algorithmic}
+
+%%----------------------------------------------------------------------------%%
+%%    Page layout                                                             %%
+%%----------------------------------------------------------------------------%%
+
+%% from setspace.sty: 1.5 spacing for 11pt font
+%\renewcommand{\baselinestretch}{1.5}
+\doublespacing
+
+%% from vmargin.sty
+\setlength{\hoffset}{-1in}
+\setlength{\voffset}{-1in}
+\setlength{\footskip}{0.75in}
+\setlength{\headsep}{0.65in}
+\setlength{\topmargin}{1in}
+\setlength{\headheight}{2\baselineskip}
+\setlength{\oddsidemargin}{1.8in}
+\setlength{\evensidemargin}{1.18in}
+\setlength{\textwidth}{\paperwidth-\oddsidemargin-\evensidemargin}
+\setlength{\textheight}{\paperheight-\topmargin-\headheight-\headsep-\footskip-1in}
+\setlength{\parskip}{1.5ex}
+\setlength{\parindent}{2em}
+\setlength{\partopsep}{5pt}
+
+% the right margin of TOC, except the line with page number
+\makeatletter
+\renewcommand{\@tocrmarg}{.5in}
+\makeatother
+
+% subfigure and subtable are listed in TOC also
+\setcounter{lofdepth}{2}
+\setcounter{lotdepth}{2}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+
+
+% from subfigure.sty: just to make the label field wider
+\makeatletter
+\renewcommand{\l@subfigure}{%
+  \@dottedxxxline{\ext@subfigure}{2}{3.9em}{3.1em}}
+\renewcommand{\l@subtable}{%
+  \@dottedxxxline{\ext@subtable}{2}{3.9em}{3.1em}}
+\makeatother
+
+% new math operator for CI3/5/7
+\DeclareMathOperator*{\sgn}{sgn}
+
+
+%%----------------------------------------------------------------------------%%
+%%    Various environments                                                    %%
+%%----------------------------------------------------------------------------%%
+
+%\theoremstyle{break}
+%\theorembodyfont{\normalfont}
+%\newtheorem{definition}{Definition}[section]
+%\newtheorem{theorem}{Theorem}[section]
+
+%% \newcommand{\QED}{%
+%%   \ifmmode % if math mode, assume display: omit penalty etc.
+%%   \else \leavevmode\unskip\penalty9999 \hbox{}\nobreak\hfill
+%%   \fi
+%%   \quad\mbox{\rule[0pt]{1.5ex}{1.5ex}}}
+%\newcommand{\disableQED}{\renewcommand{\QED}{}}
+%\newenvironment{proof}%
+%  {\setlength{\parindent}{0pt}\textbf{Proof: }}%
+%  {\QED}
+
+\newcounter{cases}
+\newenvironment{Cases}%
+  {\begin{list}%
+    {Case \arabic{cases}:}%
+    {%
+      \usecounter{cases}%
+      \setlength{\labelsep}{5pt}%
+      \settowidth{\labelwidth}{Case }
+      \setlength{\leftmargin}{\labelwidth}
+      \advance\labelwidth 20pt
+      \advance\leftmargin 25pt
+      \setlength{\listparindent}{0pt}%
+      \setlength{\itemindent}{0pt}%
+    }%
+  }%
+  {\end{list}}
+
+\newenvironment{xmlcode}%
+  {
+    \noindent
+    \begin{minipage}{\textwidth}
+      \begin{singlespace}
+%	\vspace*{0pt}
+  }
+  {
+%	\vspace*{0pt}
+      \end{singlespace}
+    \end{minipage}
+
+  }
+
+\newtheorem{lemma}{Lemma}
+\newcommand{\ai}{\ensuremath{\alpha_i}\xspace}
+\newcommand{\aidash}{\ensuremath{\alpha_i'}\xspace}
+\newcommand{\aij}{\ensuremath{\alpha_{i,j}}\xspace}
+\newcommand{\bi}{\ensuremath{\beta_i}\xspace}
+\newcommand{\bidash}{\ensuremath{\beta_i'}\xspace}
+\newcommand{\bij}{\ensuremath{\beta_{i,j}}\xspace}
+\newcommand{\crone}{\ensuremath{c_{R1}}\xspace}
+\newcommand{\crtwo}{\ensuremath{c_{R2}}\xspace}
+
+\newenvironment{proof}[1][Proof.]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\qed \end{trivlist}}
+\def\qed{\hspace*{\fill}\framebox[1.5ex]{}}
+
+
+%%----------------------------------------------------------------------------%%
+%%    Environment for Title Page                                              %%
+%%----------------------------------------------------------------------------%%
+
+\makeatletter
+\renewcommand{\maketitle}
+{%
+  \begin{titlepage}
+    \renewcommand{\baselinestretch}{1}
+    \begin{center}
+      \vspace*{\stretch{1}}
+      {\LARGE\@title\par}
+      \vspace*{1cm}
+      {\large\textit{by}\par}
+      \vspace*{1cm}
+      {\Large\@author\par}
+      \vspace*{\stretch{5}}
+%       {\it (Temporary Binding for Examination Purposes)\par}
+      {\hbox{}\par}
+      \vspace*{\stretch{5}}
+      {
+        A thesis submitted in partial fulfillment of the requirements for \\
+        the degree of Master of Philosophy \\
+        at The University of Hong Kong.
+        \par
+      }
+      \vspace*{\stretch{0.5}}
+      {\large\@date\par}
+      \vspace*{\stretch{0.5}}
+    \end{center}
+  \end{titlepage}
+}
+\makeatother
+
+
+%%----------------------------------------------------------------------------%%
+%%    Environment for Abstract                                                %%
+%%----------------------------------------------------------------------------%%
+
+\makeatletter
+\newenvironment{abstract}%
+{
+  \if@twocolumn
+    \@restonecoltrue\onecolumn
+  \else
+    \@restonecolfalse\newpage
+  \fi
+  \pagestyle{empty}%
+  \setcounter{page}\@ne
+  \begin{center}
+  \large
+  Abstract of thesis entitled            \par
+  ``\@title''                            \par
+                                         \vspace*{0.2in}
+  Submitted by                           \par
+  \@author                               \par
+                                         \vspace*{0.2in}
+  for the degree of Master of Philosophy \\
+  at The University of Hong Kong         \\
+  in \@date
+  \end{center}
+  \vspace*{0.5in}
+%Start Abstract
+\input{ch_abstract}
+}%
+{
+  \if@restonecol\twocolumn \else \newpage \fi
+  \if@twoside\else
+  \setcounter{page}\@ne
+  \fi
+}
+\makeatother
+
+
+%%----------------------------------------------------------------------------%%
+%%    Environment for Declaration                                             %%
+%%----------------------------------------------------------------------------%%
+
+\makeatletter
+\newcommand{\makedeclaration}
+{
+\chapter*{Declaration}
+\addcontentsline{toc}{chapter}{Declaration}
+
+\NI
+I declare that this thesis represents my own work, except where due acknowledgement is made, and that it has not been previously included in a thesis, dissertation or report submitted to this University or to any other institution for a degree, diploma or other qualifications.
+
+\vspace*{1.5in}
+
+\noindent%
+\begin{tabular}{@{}l@{}}
+\dotfill \\
+\@author \hspace*{3cm}\\
+\@date\\
+\end{tabular}
+}
+\makeatother
+
+
+%%----------------------------------------------------------------------------%%
+%%   Various conventions                                                      %%
+%%----------------------------------------------------------------------------%%
+
+\newcommand{\NI}{\noindent}
+
+\hyphenation{ac-know-ledge-ment}
+\hyphenation{data-bases}
+\hyphenation{data-base}
+\hyphenation{research}
+
+
+
+%%----------------------------------------------------------------------------%%
+%%    Other stuff                                                             %%
+%%----------------------------------------------------------------------------%%
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\it \thepage}
+\fancyhead[RE]{\slshape \rightmark}
+\fancyhead[LO]{\slshape \leftmark}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}%
+{
+  \fancyhf{}
+  \fancyfoot[C]{\it \thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+
+%%----------------------------------------------------------------------------%%
+%%    Content of thesis                                                       %%
+%%----------------------------------------------------------------------------%%
+
+%%---------------------%%
+\begin{document}
+%%---------------------%%
+\abstract
+\maketitle
+%%---------------------%%
+\frontmatter
+%%---------------------%%
+\makedeclaration
+\include{ch_ack}
+\tableofcontents
+\listoffigures
+\listoftables
+
+%%---------------------%%
+\mainmatter
+%%---------------------%%
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE]{\slshape \rightmark}
+\fancyhead[LO]{\slshape \leftmark}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}%
+{
+  \fancyhf{}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+\include{ch_introduction}
+\include{ch_wsipl}
+\include{ch_ramj}
+\include{ch_conclusion}
+
+%%---------------------%%
+\appendix
+%%---------------------%%
+\include{app_wsipl}
+
+%%---------------------%%
+%\backmatter
+%%---------------------%%
+\bibliographystyle{plain}
+\bibliography{bib_ws,bib_ramj}
+
+%%---------------------%%
+\end{document}
+%%---------------------%%
+
+
+%%----------------------------------------------------------------------------%%
+%%    End of thesis                                                           %%
+%%----------------------------------------------------------------------------%%

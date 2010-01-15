@@ -1,0 +1,859 @@
+% Template article for Elsevier's document class `elsarticle'
+% with harvard style bibliographic references
+% SP 2008/03/01
+
+\documentclass[authoryear,preprint,12pt]{elsarticle}
+
+% Use the option review to obtain double line spacing
+% \documentclass[authoryear,preprint,review,12pt]{elsarticle}
+
+% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
+% for a journal layout:
+% \documentclass[authoryear,final,1p,times]{elsarticle}
+% \documentclass[authoryear,final,1p,times,twocolumn]{elsarticle}
+% \documentclass[authoryear,final,3p,times]{elsarticle}
+% \documentclass[authoryear,final,3p,times,twocolumn]{elsarticle}
+% \documentclass[authoryear,final,5p,times]{elsarticle}
+% \documentclass[authoryear,final,5p,times,twocolumn]{elsarticle}
+
+% if you use PostScript figures in your article
+% use the graphics package for simple commands
+% \usepackage{graphics}
+% or use the graphicx package for more complicated commands
+\usepackage{graphicx}
+% or use the epsfig package if you prefer to use the old commands
+% \usepackage{epsfig}
+
+% The amssymb package provides various useful mathematical symbols
+\usepackage{amssymb}
+% The amsthm package provides extended theorem environments
+% \usepackage{amsthm}
+
+% The lineno packages adds line numbers. Start line numbering with
+% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
+% for the whole article with \linenumbers.
+% \usepackage{lineno}
+
+% \linenumbers
+
+\journal{Data and Knowledge Engineering}
+
+\begin{document}
+
+\begin{frontmatter}
+
+% Title, authors and addresses
+
+% use the tnoteref command within \title for footnotes;
+% use the tnotetext command for theassociated footnote;
+% use the fnref command within \author or \address for footnotes;
+% use the fntext command for theassociated footnote;
+% use the corref command within \author for corresponding author footnotes;
+% use the cortext command for theassociated footnote;
+% use the ead command for the email address,
+% and the form \ead[url] for the home page:
+% \title{Title\tnoteref{label1}}
+% \tnotetext[label1]{}
+% \author{Name\corref{cor1}\fnref{label2}}
+% \ead{email address}
+% \ead[url]{home page}
+% \fntext[label2]{}
+% \cortext[cor1]{}
+% \address{Address\fnref{label3}}
+% \fntext[label3]{}
+
+\title{A simple approach to more efficient and high quality testing of database applications}
+
+% use optional labels to link authors explicitly to addresses:
+% \author[label1,label2]{}
+% \address[label1]{}
+% \address[label2]{}
+
+\author{Eric Lo}
+
+\address{Department of Computing, Hong Kong Polytechnic University}
+\address{ericlo@comp.polyu.edu.hk}
+
+\begin{abstract}
+Testing is one of the most expensive tasks in today's software development cycle 
+and it is very important to devise techniques that speed up the whole testing process.
+In a recent paper \cite{cidr05},
+it has been shown that tests on database applications can be speeded up by using 
+proper test execution strategies and test optimization algorithms.
+This papers proposes a new 
+test execution strategy called {\sc safe-optimistic}
+and a new test optimization algorithm called {\sc slice*}.
+{\sc safe-optimistic} is better than the strategy proposed in \cite{cidr05}
+in which it reduces testing time without jeopardizing test quality.
+{\sc slice*} has a better performance than the test optimization algorithms in \cite{cidr05} in all cases
+and it keeps on performing well even if the subject application and the test suite evolve.
+\end{abstract}
+
+\begin{keyword}
+% keywords here, in the form: keyword \sep keyword
+database \sep database application \sep testing \sep test automation
+
+% PACS codes here, in the form: \PACS code \sep code
+
+% MSC codes here, in the form: \MSC code \sep code
+% or \MSC[2008] code \sep code (2000 is the default)
+
+\end{keyword}
+
+\end{frontmatter}
+
+% main text
+\section{Introduction}
+\label{intro}
+
+Testing is one of the most expensive tasks in today's software development cycle.
+With the increasing adoption of iterative development methodologies 
+which emphasize the importance of testing
+such as Agile~\cite{agile} and Extreme Programming~\cite{xp},
+more tests are being written and executed to improve the quality of products.  
+Nowadays, large software vendors such as Microsoft is spending 50 percent of their development cost on testing \cite{ms1, ms2}.
+Consequently, it is very important to devise techniques that speed up the whole testing process.
+
+Testing database applications is more daunting 
+testing traditional applications because database applications involve an external \emph{state} -- the test database.
+Because test cases for database applications may either insert, delete or retrieve records to or from a database,
+when verifying the expected output of a test case during a test, 
+it is necessary to make sure that each test case is working on a consistent database state.
+For example, a test case that checks the reporting component
+of an order management application must always
+be executed against the same test database in order to
+make sure that the report shows the same orders every
+time it is executed.  
+This means the database state must be reset every time a test case begins execution.
+Database resets, however, are time expensive \cite{chatterjee04, cidr05}, especially for large-scale database applications like information systems.
+For example, \cite{cidr05} reports that it takes about two minutes to reset the database of SAP/R3 because 
+it involves reverting millions of records, restarting the database server process, and flushing the database buffer pool.  
+Testing becomes very inefficient if we need reset the database state every time we execute a test case.
+
+There are two ways to improve the efficiency of testing database applications.
+The first way is to \emph{automate} tests.
+For example, rather than manually resetting the database in the beginning of each test case,
+we can automate it using testing frameworks like JUnit \cite{junit}.
+To that end, \cite{cidr05} has designed such a testing framework for database applications.
+
+The second way to improve the efficiency of testing database applications
+is to devise \emph{test execution strategies} and \emph{test optimization algorithms} 
+so as to minimize the number of expensive database reset operations during a test.
+To that end, \cite{cidr05} has proposed the {\sc optimistic} test execution strategy and
+a few test optimization algorithms.
+{\sc optimistic} suggests that database resets should be carried out lazily during a test.
+The {\sc slice} algorithm, which is the most efficient test optimization algorithm in \cite{cidr05}, 
+further optimizes the execution time of a test by devising an ordering for executing test cases.
+It has been shown that the number of database resets in a test can be reduced
+by executing test cases according to the devised order.
+The average execution time of a test 
+can attain significant improvement by the uses of {\sc optimistic} and {\sc slice}.
+
+In fact, the techniques proposed in \cite{cidr05} can be improved in two dimensions: efficiency and test quality.
+For efficiency, we propose a simpler version of {\sc slice} that has better performance but with less overhead.
+In particular, {\sc slice} must maintain a so-called \emph{conflict database} that stores the dependencies of test cases.
+At the beginning of each test, {\sc slice} consults the conflict database in order to devise the new test case execution order.
+At the end of each test, {\sc slice} analyzes the dependencies of the executed test cases
+and inserts that information into the conflict database.
+Our proposed optimization algorithm, {\sc slice*}, in contrast, does not maintain any external information or use a conflict database.
+This simplification reduces not only the overhead of maintaining a conflict database
+but also the overall execution time.
+{\sc slice*} outperforms {\sc slice} especially when
+the system under test (SUT) and the test suite evolve (e.g., insertion of test cases).
+
+Although the techniques in \cite{cidr05} indeed improves the test execution time,
+the authors in \cite{cidr05} also confess that they are trading test quality for efficiency.
+In particular, the {\sc optimistic} test execution strategy, which suggests that database resets should be carried out only 
+when a test case fails, indeed may result in \emph{false positives}.
+A false positive test case refers to a test case that should fail (as it covers a bug) but it failed to do so during a test.
+In \cite{cidr05}, false positives happen when 
+a test case which supposed to cover a bug (i.e., it should fail) operates on an inconsistent database state
+(because the test database is being reset lazily) so that it cannot detect the bug properly.
+
+The \emph{quality} of a test depends on the number false positive test cases occurred during a test.
+However, as mentioned in \cite{cidr05}, there is always a trade-off between efficiency and test quality, 
+and it is difficult to \emph{research} techniques that can improve efficiency without loss of test quality.
+In view of this, in this paper, we \emph{re-engineering} 
+the {\sc optimistic} test execution strategy.
+The new test execution strategy, {\sc safe-optimistic}, suggests 
+that the oracle of a test case should include its associated database queries and the corresponding query results.\footnote{An oracle is a mechanism for
+comparing the expected results of a test case with the actual execution results
+and determine whether the test case passes or fails \cite{BinderTestingOOSystems}.}
+Experimental results show that 
+the use of the new {\sc safe-optimistic} test execution strategy and the new {\sc slice*} test optimization algorithm
+can improve test efficiency without jeopardizing test quality.
+
+The remainder of this paper is organized as follows: 
+Section \ref{background} presents the background of testing database applications as well as 
+various existing test execution strategies and test optimization algorithms.
+Section \ref{slicestar} presents the {\sc slice*} test optimization algorithm and shows
+how it deals with test case evolution and SUT evolution.
+Section \ref{safe-optimistic} presents the {\sc safe-optimistic} test execution strategy.
+Section \ref{experiment} reports the experimental results,
+followed by a discussion of other related work in Section \ref{relatedwork}.
+Finally, Section \ref{conclusions} concludes our study.
+
+
+\section{Background}
+\label{background}
+  
+  
+Database applications are conceptually separated in multiple tiers -- or layers -- which distinctly separate code intended for different purposes.  Figure \ref{dba} shows a 3-tier model for database applications.
+
+\begin{figure}
+\centering
+\scalebox{0.8}{
+\includegraphics{figures/dba.eps}
+}
+\caption{3-tier model for database applications}
+\label{dba}
+\end{figure}
+
+The top layer is the Presentation Layer.  This layer provides an interface (e.g., GUI) through which the user interacts with.  The next layer is the Application Logic Layer.  This layer contains all the executable programs which encode the business rules of the application.  The Data Access Layer acts as a bridge between the Application Logic Layer and the backend database allowing the Application Logic Layer to interact with the database, regardless of which database management system is handling the data. To perform database operations, the Application Logic Layer simply constructs database queries (e.g., SQL)
+or invokes the stored procedures in the database through the Data Access Layer.
+The Data Access Layer handles all the low-level interactions with the backend database and returns the query results to the Application Logic Layer on request.
+
+\begin{figure}
+\centering
+\scalebox{0.6}{
+\includegraphics{figures/regression.eps}
+}
+\caption{A Regression Testing Framework for Database Applications}
+\label{regressiontest}
+\end{figure}
+
+As in \cite{cidr05}, in this paper, we focus on techniques for black-box regression tests \cite{sebook}.
+The purpose of regression tests for database applications is to detect changes in the behavior of a database application after the application or its configuration has been changed.  
+%Without the loss of generality, this paper focuses on black-box testing, i.e., there is no knowledge of the implementation of the application available \cite{sebook}.  The techniques in this paper, however, could be generalized to
+%different regression testing methodologies for database applications; in fact,
+%we plan to generalize the techniques in this paper to white-box testing as part of our future work.
+Figure \ref{regressiontest} shows a typical way to set up a regression test environment for database applications.
+
+To construct a test case, the regression test tool captures requests from test engineers (or a test case generation tool), 
+forwards the requests to the SUT and receives answers from it.  
+The tool then records the answers from the SUT and returns the answers to the test engineers.  
+As in all testing methodologies, during the construction of a test case,
+the SUT is assumed to work correctly so that the answers returned by the SUT are correct 
+and the new state of the test database is assumed to be correct, too.  
+The recorded requests and answers are usually stored as a script (e.g., in XML format), 
+which is regarded as a test case for testing certain functions or components of an application.
+
+In order to record another test case, the test database has to be reset.  
+Otherwise, the new test case will work on an inconsistent database state and the recorded answers might not be correct.  
+Typically, companies use a version of their operational database as a test database so that their test cases
+are as realistic as possible \cite{cidr05}.  As a result, test databases can become very large.
+There are alternative ways to implement a database reset operation.
+However, as pointed out by \cite{cidr05}, in any event, that is an expensive operation (in the order of minutes).
+
+%There are many ways to reset the test database during regression testing.  One simple implementation is to keep two copies of the test database and revert the data from the clean copy after each test case.  
+%Since companies often use a copy of the production database as the test database, the size of the test database is very large and thus this reset operation takes long time.  Sometimes, it is even not enough to carry out a database reset by just copying databases.  In some large scale information systems with data caching or data replication features (e.g., Lotus Domino \cite{lotus}), a database reset even includes restarting the database server process and flushing the cache pool and message queues, in addition to copying database data.
+%Another way of resetting the database is to execute a database-level undo operation by making use the undo logs of 
+%the database \cite{gray}; however, this implementation needs very in-depth knowledge on database administration
+%and thus is not commonly used in practice.
+%In white-box testing, the database reset operation may be possible to implement as reverting the affected tables or rows only.  However, this implementation conversely needs a lot human effort because each test case needs a tailor-made database reset operation, which is not suitable for regression tests that consist of possibly thousands of test cases.
+%As a result, in any event, a database reset is a time expensive operation in regression testing.
+
+    
+  \subsection{Test execution strategy}
+  \label{testexecutionstrategy}
+If a regression test has to be carried out, the test tool executes the recorded test cases one by one.
+For each test case, the regression test tool replays automatically the requests recorded in the script to the SUT
+and compares the answers of the SUT with the expected answers recorded in the script.  
+In theory, a test case passes if all its requests produce correct answers and the state of the
+test database is correct after the execution of the test case. 
+In practice, this criterion is usually relaxed and it only checks the correctness of answers \cite{cidr05}. 
+That is because checking the state of the test database after each test run can be
+prohibitively expensive.
+To make sure that a test case is executed against a consistent database state,
+it is theoretically necessary to reset the test database back to a consistent state before each test case starts its execution.
+However, as mentioned, such a ``brute-force'' approach is in practice infeasible 
+because database resets are expensive operations.  A test with, say, 1000 test cases,
+would require 1000 database reset operations.
+Assume the SUT is the SAP R/3 mentioned in \cite{cidr05}.
+Executing a test would require a total of 1000 $\times$ 2 minutes.
+\cite{cidr05} mitigates this problem by applying the {\sc optimistic} execution strategy.
+      
+      \subsubsection{The {\sc optimistic} test execution strategy}
+The idea of {\sc optimistic} is very simple and is based on the observation that a database reset is unnecessary if 
+the executed test cases do not affect the current test case.
+The basic idea of {\sc optimistic} is thus to carry out the database reset operation lazily,
+resetting the test database and re-executing the failed test case only when a test case fails.
+For example, assume a test with five test cases $T_1, \ldots, T_5$ is executed 
+according to {\sc optimistic}, and resulting in the following test execution ($\cal{R}$ denotes a database reset operation):
+
+$$\:\:
+{\cal R} \:\: T_1 \:\: T_2 \:\: {\cal R} \:\: T_2 \:\:  T_3 \:\: {\cal R} \:\: T_3 \:\: T_4 \:\:  T_5
+$$
+
+The first failed test case is $T_2$.\footnote{The first database reset $\cal{R}$ is always required in order to make sure the test starts with a consistent test database.}  
+Since {\sc optimistic} carries out database resets lazily, there are two possible reasons why $T_2$ failed: 
+(1) $T_2$ was reporting a real application bug; or (2) $T_2$ failed because $T_1$ changed data in the test database that was needed by $T_2$.  
+For the latter reason, $T_2$ failed even though the application has no bug and $T_2$ is a \emph{false negative} test case.  
+To distinguish between a false negative test case and a real failure test case, {\sc optimistic} carries out a database reset after a test case fails,
+then re-executes the failed test case.  
+If the test case fails again, it is asserted to be reporting a real application bug.
+Thus, $T_2$ and $T_3$ were once false negatives and were re-executed after the database was reset.
+
+
+
+\begin{figure}
+\centering
+\scalebox{0.8}{
+\begin{tabular}{ll}\hline
+1.&total:=execSQL(SELECT count(*) FROM orders);\\
+2.&if (total $\leq$ 10)\\
+3.&\hspace*{0.7cm} output("$\leq$ 10 orders"); //recorded expected result\\
+4.&else\\
+5.&\hspace*{0.7cm} output("$>$ 10 orders");\\\hline
+\end{tabular}
+}
+\caption{A database application $\cal{A}$; total:=5 under a consistent database state.}
+\label{codeexample1}
+\end{figure}
+
+\begin{figure}
+\centering
+\scalebox{0.8}{
+\begin{tabular}{ll}\hline
+1.&total:=execSQL(SELECT count(*) FROM orders);\\
+2.&{\bf if (total $\geq$ 10)    /************* BUG *************/ }\\
+3.&\hspace*{0.7cm}  output("$\leq$ 10 orders"); //actual result (false positive!)\\
+4.&else\\
+5.&\hspace*{0.7cm}  output("$>$ 10 orders");\\\hline
+\end{tabular}
+}
+\caption{$\cal{A}'$: A regressed version of $\cal{A}$; total:=105 under an inconsistent database state.}
+\label{codeexample2}
+\end{figure}
+
+
+      \subsubsection{Drawback of {\sc optimistic}}
+      \label{drawbackoptimistic}
+{\sc optimistic} has very good performance when compared with the ``brute-force'' approach 
+because it carries out database resets only when necessary.
+However, {\sc optimistic} may result in \emph{false positive} test cases, i.e., a test case does not fail although it should fail.  
+As an example, let us consider Figure \ref{codeexample1} which shows the code of a database application $\cal{A}$ which is initially correct.
+
+Assume that a test case $T_1$ that covers the code fragment of $\cal{A}$ is recorded with a consistent database state $\cal{D}$.\footnote{Note that Figures \ref{codeexample1} and \ref{codeexample2} are for illustration only; the test cases still regard the application as a black box.}
+The variable \texttt{total} in line 1 was initialized with a value of, say, 5, from a consistent database state 
+and the expected answer ``$ \leq $ 10 orders'' was recorded in $T_1$.
+
+Now, assume the $\leq$ sign in line 2 
+in Figure \ref{codeexample1} is changed to a $\geq$ sign after some code modifications.
+This is obviously a bug (see Figure \ref{codeexample2} for the regressed application $\cal{A}'$).  
+In that case, if a regression test is carried out using {\sc optimistic} on $\cal{A}'$,
+and assume that a test case $T_0$ has inserted 100 new orders into the table \texttt{orders}
+before the execution of $T_1$,
+then $T_1$ would retrieve data from an inconsistent database state.
+As a result, the variable {\tt total} (line 1 in Figure \ref{codeexample2}) would be initialized with a value of greater than 100.  
+That would lead to a match between the expected and actual answers.
+$T_1$ would then be false positive because it does not fail even though it covers the bug.
+This example demonstrates how {\sc optimistic} trades test quality (introducing false positives) for efficiency (fewer database resets).
+While this is acceptable in some software systems, 
+it would be useful to devise techniques that eliminate that problem so as to test mission-critical software such as financial and health-care applications.
+In Section \ref{safe-optimistic}, we present such a test execution strategy.
+
+  \subsection{Test optimization algorithm}
+     \cite{cidr05} also discusses how to further improve the efficiency of test execution
+      by using a number of \emph{test optimization algorithms} that exploits the order in which {\sc optimistic} executes test cases.
+      For example, in one day during the nightly regression test, test case $T_2$ was executed after test case $T_1$ and the test database had to be reset for $T_2$.
+      A test optimization algorithm should \emph{learn} this ``conflict'' and devise a test execution order 
+      in which, next time, $T_2$ is executed before $T_1$.  
+      Executing test cases in this order would allow the elimination of 
+      some database resets and further reduce the overall test execution time.
+		             
+		  Without analyzing the test cases and the SUT using a white-box approach, it is NP-hard to devise an optimal algorithm \cite{cidr05}.
+      Thus, all the proposed test optimization algorithms in \cite{cidr05}, 
+      namely, {\sc slice}, {\sc minfanout}, {\sc maxdiff}, {\sc minweighteddiff} and {\sc maxweighteddiff},
+      are best-effort algorithms.  
+      The {\sc slice} test optimization algorithm has the best 
+      performance 
+      among all the proposed algorithms and this is why we consider only {\sc slice} here.
+      Note that all the proposed test optimization algorithms in \cite{cidr05} must maintain an external conflict database that 
+      stores the detected conflict of test cases.
+      At the beginning of each test, those test optimization algorithms consult the conflict database and devise a new test case execution order.
+      At the end of a test, the conflicts between test cases are inserted into the conflict database.
+      In the example above, 
+      the conflict between test case $T_1$ and $T_2$, denoted as $\langle T_1 \rangle \rightarrow T_2$, is inserted into the the conflict database.
+      For the subsequent tests, these test optimization algorithms try to avoid executing $T_1$ before $T_2$.
+      
+      \subsubsection{{\sc slice}}
+      \label{slice}
+      The {\sc slice} test optimization algorithm works by identifying sequences of test cases that can be executed sequentially 
+      without any database reset.   Those sequences are called \emph{slices} and the algorithm tries to leave them intact in the next test.
+      Consider a regression test $\cal{T}$ with five test cases: $T_1, \ldots, T_5$.
+      The first time we execute the test (i.e., the first \emph{iteration} in today's software development terminology), 
+      the test cases are executed in a random order.
+      Let us assume this results in the following test execution, which is based on the {\sc optimistic} execution strategy:
+
+$$
+{\cal R} \:\: T_1 \:\: T_2 \:\: T_3 \:\: {\cal R} \:\: T_3 \:\: T_4 \:\: T_5 \:\: {\cal R} \:\: T_5
+$$
+
+In the first iteration, there are three database resets 
+and the {\sc slice} algorithm inserts two conflicts into the conflict database:
+
+\begin{itemize}
+\item $\langle T_1, T_2 \rangle \rightarrow T_3$
+\item $\langle T_3, T_4 \rangle \rightarrow T_5$ 
+\end{itemize}
+
+The two conflicts $\langle T_1, T_2 \rangle \rightarrow T_3$ and $\langle T_3, T_4 \rangle \rightarrow T_5$
+state that two database resets were carried out 
+because $T_1$ was executed before $T_2$, and 
+$T_2$ and $T_3$ were executed before $T_4$.
+So, there are three slices: $\langle T_1, T_2 \rangle$, $\langle T_3, T_4 \rangle$, and $\langle T_5 \rangle$.
+At the beginning of each test,
+the {\sc slice} algorithm 
+uses the conflicting information in the conflict database and the collected slices
+to devise an execution order with the goal of minimizing database resets.
+In particular, if the conflict database contains a conflict information of $\langle S \rangle \rightarrow T_i$ (where $S$ is a slice of test cases), 
+and there are no known conflicts between $T_i$ and any of the test cases in $S$,
+{\sc slice} should arrange $T_i$ to be executed \emph{before} $S$.
+At the same time, {\sc slice} does not change the order in which the test cases in $S$ are executed
+because these test cases can be executed in that order without requiring a database reset.
+In the example above, {\sc slice} devises the following execution order:
+$T_5, T_3, T_4, T_1, T_2$  for the second iteration.
+Let us assume that this iteration results in the following test execution:
+
+
+$$
+{\cal R} \:\: T_5 \:\: T_3  \:\: T_4 \:\: T_1 \:\: T_2 \:\: {\cal R} \:\: T_2
+$$
+
+In addition to the already known two conflicts, 
+one more conflict $\langle T_5, T_3, T_4, T_1 \rangle \rightarrow T_2$ is inserted into the conflict database.
+The slices after this iteration are $\langle T_5, T_3, T_4, T_1 \rangle$ and $\langle T_2 \rangle$.
+The next time the test is executed, {\sc slice} suggests the following execution order: $T_2, T_5, T_3, T_4, T_1$.
+
+At each iteration, {\sc slice} reorders the test cases of a test until reordering produces no further improvement, either because 
+the execution is perfect (no resets except the initial reset) or because of cycles in the conflict database 
+(e.g., $\langle T_1 \rangle \rightarrow T_2, \langle T_2 \rangle \rightarrow T_3, \langle T_3 \rangle \rightarrow T_2$).
+      
+  \subsubsection{Drawback of the {\sc slice} test optimization algorithm}
+  \label{drawbackslice}
+
+The reordering mechanism of {\sc slice}, which is based on the 
+conflicting information stored in the conflict database, 
+assumes that the SUT and the test suite do not change during the development cycle.
+But this assumption seldom holds in practice.
+If the SUT or the test suite are changed, 
+many conflicts that are stored in the conflict database become obsolete.
+This would lead to {\sc slice} devising a poor test execution order,
+resulting in many unnecessary database resets.
+However, if that assumption does hold,
+{\sc slice} indeed beats many alternative algorithms (e.g., {\sc minfanout}, {\sc maxdiff}, {\sc minweighteddiff} and {\sc maxweighteddiff} in \cite{cidr05}).
+This leads us to ask whether {\sc slice} would still be able to preserve its high efficiency if we just reorder the slices without consulting the conflict database.
+In other words, 
+would a simplified version of {\sc slice}, we call it as {\sc slice*},
+that devises a new execution order simply by 
+shuffling the slices collected in the last iteration,
+produce a test as good as that is devised by the full version?
+
+To answer that question, we have repeated the experiments in \cite{cidr05} using 
+{\sc optimistic} (i.e., no use of any optimization algorithm), {\sc slice} and {\sc slice*}.
+For fairness, we borrowed the experimental kit, which includes a synthetic test case generator and a synthetic database application, from the authors of \cite{cidr05}.
+We repeated the experiments on a Linux AMD 2.2 GHz machine with 4 GB main memory.
+The experimental kit in \cite{cidr05} is able to generate tests with 
+different numbers of synthetic test cases and it is possible to control
+the number of conflicts between test cases and the distribution which test cases are in conflict.
+In \cite{cidr05}, three sets of simulations were conducted and we have repeated them, on a larger scale, using 
+{\sc optimistic}, {\sc slice} and {\sc slice*}:
+
+\begin{enumerate}
+\item Varying the number of test cases:  we carried out experiments with 1,000 and 10,000 test cases.
+
+\item Varying the number of conflicts:  we carried out experiments with 1K, 10K, 100K and 1M conflicts\footnote{1M conflicts is only appicable to the case of 10K test cases} in the test cases.
+
+\item Varying the distribution of conflicts:  we carried out experiments with Uniformly and Zipf distributed conflicts.  For the case of 
+Uniformly distributed conflicts, all test cases are in conflict with others with the same probability.  For the case of 
+Zipf distributed conflicts, some test cases in in conflict with many others according to a Zipf distribution.
+\end{enumerate}
+
+Each experiment consisted of 10 iterations (so allowing {\sc slice} to learn and to collect more conflicts in order to improve its performance).
+As in \cite{cidr05}, the average execution time of a test case is 30 seconds and the database reset is set to 2 minutes.
+We measure the number of database resets carried out by each approach and the average test execution time.
+Furthermore, to maximize the performance of {\sc slice},
+we chose not to alter the synthetic application and test suite along the 10 iterations.
+Tables \ref{1000} and \ref{10000} show the average number of resets for 
+{\sc brute-force} (i.e., carry out a database reset between each test case),
+{\sc optimistic} (i.e., no use of any optimization algorithm),
+{\sc slice} and 
+{\sc slice*} in scenarios with 1000 and 10000 uniformly distributed test cases, respectively.
+Since experiments using Zipf distributed test cases 
+produce almost the same results as using Uniformly distributed test cases (\cite{cidr05} also made similar findings),
+we omit them here for brevity.
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|c||c|c|c|}\hline
+Conflicts        &    1K & 10K & 100K & 1K   & 10K & 100K    \\\hline\hline
+{\sc brute-force}&  1000 &1000 & 1000 & 41:40&41:40& 41:40   \\\hline
+{\sc optimistic} &    23 & 84   & 260 & 9:06 &11:08& 17:01   \\\hline
+{\sc slice}      &    15 & 51 & 148 & 8:35 & 9:42& 13:17   \\\hline
+{\sc slice*}     &   12  & 43 & 141 & 8:30 & 9:24& 13:03   \\\hline
+\multicolumn{4}{c}{Average DB resets} &\multicolumn{3}{c}{Average time (hh:mm)}
+\end{tabular}
+\caption{Average resets: 1000 test cases, Uniform, Vary Conflicts, 10 iterations}
+\label{1000}
+\end{table}
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|c||c|c|c|}\hline
+Conflicts        &    1K & 10K & 100K & 1K   & 10K & 100K    \\\hline\hline
+{\sc brute-force}&  10000 &10000 & 10000 & 417:02& 417:02& 417:02   \\\hline
+{\sc optimistic} &    76 & 258   & 802 & 86:01 & 91:14 & 111:25   \\\hline
+{\sc slice}      &   38  & 134  & 444  & 84:28 & 87:03& 98:16   \\\hline
+{\sc slice*}     &   39  & 133  & 441  & 84:30 & 87:01& 98:10   \\\hline
+\multicolumn{4}{c}{Average DB resets} &\multicolumn{3}{c}{Average time (hh:mm)}
+\end{tabular}
+\caption{Average resets: 10000 test cases, Uniform, Vary Conflicts, 10 iterations}
+\label{10000}
+\end{table}
+
+Tables \ref{1000} and \ref{10000} show similar results as \cite{cidr05}.
+In particular, {\sc slice} reduces more number of database resets and at a faster test execution time than
+{\sc optimistic} and the brute-force approach.
+And {\sc slice*}, which is a simplified version of {\sc slice}, has a similar performance to {\sc slice}.
+This suggests that
+we can simply use {\sc slice*} instead of {\sc slice}.
+Furthermore, we envision that updates on the SUT or the test suite will make the conflicts stored in the 
+conflict database obsolete.
+That would lead {\sc slice*} outperforms {\sc slice} in those cases.
+We describe these issues in detail in the next section.
+  
+\section{The {\sc slice*} test optimization algorithm}
+   \label{slicestar}
+   
+Figure \ref{algorithm} shows the {\sc slice*} test optimization algorithm.
+It scans the execution history of the previous test and identifies a set of slices (lines 4--18).
+It then shuffles the slices and returns a new execution order $Q$ (line 20).
+The next test will then follow $Q$ and execute the test cases using the {\sc optimistic} test execution strategy.
+
+In fact, we have attempted to improve {\sc slice*} in many different ways.
+One way was, instead of randomly shuffling the slices, 
+longer slices are put at the beginning of $Q$ (hoping that longer slices have more chances to expand first).
+However, none of our strategies were able to further improve {\sc slice*}.
+
+\begin{figure}%\begin{small}
+\scalebox{0.9}{
+%\footnotesize
+\centering \fbox{\sf
+\begin{minipage}{1.01\linewidth}
+\hspace*{0.1cm} \textbf{Input: A test history $H$ resulted from a test using {\sc optimistic}} \vspace{0.1cm}\\
+\hspace*{0.1cm} \textbf{Output: A new test execution order $Q$ for the next test}\\
+\tt
+\makebox[0.80cm][r]{(1)}\hspace*{0.1cm}$S=\{\}$; //$S$ is a set of slices\\
+\makebox[0.80cm][r]{(2)}\hspace*{0.1cm}$T = null$; //$T$ is a test case\\
+\makebox[0.80cm][r]{(3)}\hspace*{0.1cm}$k=0$;\\
+\makebox[0.80cm][r]{(4)}\hspace*{0.1cm}/* Parse $H$ to collect slices */\\ 
+\makebox[0.80cm][r]{(5)}\hspace*{0.1cm}FOREACH item $i$ in $H$\\
+\makebox[0.80cm][r]{(6)}\hspace*{0.3cm}  IF $i$ is the first database reset $\cal{R}$ in $H$\\
+\makebox[0.80cm][r]{(7)}\hspace*{0.5cm}    $k=1$; //ignore the first database reset\\
+\makebox[0.80cm][r]{(8)}\hspace*{0.3cm}  ELSE IF item $i$ is a test case\\
+\makebox[0.80cm][r]{(9)}\hspace*{0.45cm}  $T=$ item $i$;\\
+\makebox[0.80cm][r]{(10)}\hspace*{0.45cm}  Append $T$ to $s_k$;\\
+\makebox[0.80cm][r]{(11)}\hspace*{0.3cm}  ELSE // item $i$ is a database reset $\cal{R}$\\
+\makebox[0.80cm][r]{(12)}\hspace*{0.45cm}  Remove $T$ from $s_k$;//remove failed $T$ from $s_k$\\
+\makebox[0.80cm][r]{(13)}\hspace*{0.5cm}   Add $s_k$ to $S$;\\
+\makebox[0.80cm][r]{(14)}\hspace*{0.5cm}   $k=k+1$;\\
+\makebox[0.80cm][r]{(15)}\hspace*{0.3cm} ENDIF\\
+\makebox[0.80cm][r]{(16)}\hspace*{0.1cm}ENDFOR\\
+\makebox[0.80cm][r]{(17)}\hspace*{0.1cm}// Append the last slice $s_k$ to $S$\\
+\makebox[0.80cm][r]{(18)}\hspace*{0.1cm}Add $s_k$ to $S$;\\
+\makebox[0.80cm][r]{(19)}\hspace*{0.1cm}// Shuffle $S$\\
+\makebox[0.80cm][r]{(20)}\hspace*{0.1cm}$Q$ = Shuffle($S$);\\
+\makebox[0.80cm][r]{(21)}\hspace*{0.1cm}RETURN $Q$;
+\end{minipage}
+}
+}
+\caption{The {\sc slice*} Test Optimization Algorithm}
+\label{algorithm}
+%\end{small}
+\end{figure}   
+   
+In the following we discuss how {\sc slice*} deals with cases when the SUT or the test suite are updated.
+
+When a new test case $T$ is added to the test suite, it is simply treated as a single slice $\langle T \rangle$ 
+and shuffled with other existing slices to become part of the new execution order.
+When a test case $T$ is deleted, then either (a) we can disassemble its corresponding slice $s=\langle T_i, \dots, T, \dots, T_j \rangle$
+into a number of individual slices (i.e., $\langle T_i \rangle , \dots, \langle T_j \rangle$) (with $T$ deleted)
+and shuffle those with other existing slices;
+or (b) we can simply delete $T$ from $s$, resulting in a slice $s'=\langle T_i, \dots, T_j \rangle$.
+Both approaches have advantages and disadvantages.
+Approach (a) is a more aggressive approach and is more likely to produce a test with more resets but is also 
+more likely to produce a test with fewer resets.
+In contrast, approach (b) is more conservative.
+An updated slice $s'$ is more likely to induce no resets in the next test,
+but it will not allow the test cases in $s'$ to be shuffled into an even better ordering.
+An updated test case is treated as a deletion followed by an insertion.
+
+%The evolution of SUT is handled similarly.  
+When the SUT is updated, it affects the performance of {\sc slice} because the conflicts stored in the conflict database becomes obsolete.
+However, it also affects the performance of {\sc slice*} because the slices identified in the previous execution also may become obsolete.
+For example, assume that a slice $\langle T_1, T_2 \rangle$ has been identified in a test execution.
+If the SUT is updated, 
+it is hard to say that the execution of test cases $T_1$ and $T_2$ on the updated SUT will not require a database reset in the next test,
+unless we are able to confirm that $T_1$ and $T_2$ are irrelevant to the updated code.
+Fortunately, this problem is called the \emph{test selection problem} and it has been well-studied in software engineering \cite{tse96rothermel, tse97rothermel}.
+There exists a wealth of tools such as \cite{tse01rothermel, icsm05willlmor} for this problem.
+As a result, every time the SUT is updated, 
+a test selection tool will be used to identify the set of affected test cases $\cal{T}$.
+Then, {\sc slice*} treats every test case $T$ in $\cal{T}$ as an \emph{updated} test case and handles it as we have described above.
+
+\section{The {\sc safe-optimistic} test execution strategy}
+   \label{safe-optimistic}
+As mentioned in Section \ref{drawbackoptimistic}, the {\sc optimistic} test execution strategy may result in false positive test cases,
+although it indeed improves the efficiency of executing tests by reducing the number of database resets.
+In fact, if a test case can include the state of the test database as part of the test oracle, 
+then false positive test cases can be identified by simply checking the consistency of the test database at that point.
+However, because checking the state of the test database after each test run can be prohibitively expensive,
+we propose to re-engineer the testing framework in Figure \ref{regressiontest}
+as well as to improve the {\sc optimistic} test execution strategy so that 
+a test case is able to check the ``state'' of the test database at a minimal overhead.
+In particular, we propose (1) to re-engineer the testing framework in Figure \ref{regressiontest}
+so that a test case can include its associated database queries and the corresponding query results as part of the oracle, and
+(2) to re-design the {\sc optimistic} test execution strategy so that it can 
+use the new framework in (1), check the ``state'' of the test database, and thereby identify false positive test cases.
+
+ \subsection{The framework}
+ 
+ Figure \ref{peda} shows the new testing framework.
+ It differs from the original framework (Figure \ref{regressiontest}) in two components: 
+ the regression test tool and 
+ the data access proxy (DAP for short).
+
+
+To construct a test case, the regression test tool records the requests from test engineers (or a test case generation tool)
+and records the answers from the SUT.  This constructs test cases just
+like the traditional regression test tool in Figure \ref{regressiontest}.
+However, the regression test tool also records the associated database queries and the corresponding query results
+as part of the test case (i.e., the oracle).
+The query results are captured by the data access proxy that is
+sitting between the SUT and the data access layer.
+The data access proxy has two roles: on the one hand it acts as a normal database
+access layer (e.g., a JDBC driver) to handle database requests from the
+SUT; on the other hand it acts as a server process to interact
+with the regression test tool directly.  
+In terms of database access, the DAP simply delegates all the requests from the
+SUT to the data access layer.  However, when it receives
+query results from the data access layer, it first stores a copy of the query
+results locally and then returns the results to the SUT.   At
+the end of test case construction, the regression test tool retrieves all the
+saved query results from the DAP.  The expected answers of the SUT, together
+with the expected database query results captured by the DAP,
+form a complete test case.  
+
+\begin{figure}
+\centering
+\scalebox{0.7}{
+\includegraphics{figures/serda.eps}
+}
+\caption{A New Testing Framework for Database Applications}
+\label{peda}
+\end{figure}
+
+
+  \subsection{The {\sc safe-optimistic} test execution strategy}
+  The {\sc safe-optimistic} test execution strategy is based on {\sc optimistic},
+  i.e., it also carries out database resets lazily in order reduce the number of database resets.
+  However, to avoid reporting false positive test cases, 
+  {\sc safe-optimistic} executes a test case $T$ as follows:
+
+\begin{enumerate}
+\item First, compare all the actual query results of $T$ with the expected query results of $T$.  
+      If the sizes or the contents of the query results are inconsistent, reset the test database automatically. Then, re-execute $T$.
+      
+\item If all the query results of $T$ are consistent, 
+      compare the answers returned by the SUT and the expected answers.  
+      If the answers are also consistent, return $T$ as a passing test case.
+      Otherwise, return $T$ as a failing test case.  
+      No database reset is necessary.
+\end{enumerate}
+
+Using this ``two-step'' oracle, 
+the regression test tool can know a test case $T$ has been executed on 
+an inconsistent database state by comparing the query results.\footnote{In theory, the consistency between query results
+does not 100\% indicate that the new database state must be consistent.
+However, this criterion is good enough to eliminate most false positives in practice.  
+For instance, in our experiments with real applications, 
+{\sc safe-optimistic} is able to report \emph{all} false positive test cases that are missed by {\sc optimistic}.}
+If the regression test tool finds that the query results are inconsistent,
+it resets the test database state through the
+data access proxy.  
+After that, similar to {\sc optimistic}, 
+the test case is re-executed against a consistent database state.
+By that time, the test case can be confirmed as either pass or fail.  
+
+To illustrate, let us again consider the examples in Figures \ref{codeexample1} and \ref{codeexample2}.
+When constructing test case $T_1$ on application $\cal{A}$,
+$T_1$ includes the expected query results which contain 5 tuples (from the \texttt{orders} table).
+Now, assume that {\sc safe-optimistic} is used instead of  {\sc optimistic} to test 
+the regressed application $\cal{A}'$.
+Furthermore, we once again assume that a test case $T_0$ that inserts 100 new orders into the table \texttt{orders} is executed before the execution of $T_1$.
+So there should be 105 tuples in the \texttt{orders} table before $T_1$ starts execution.
+When the regression test tool executes $T_1$,
+according to {\sc safe-optimistic}, 
+it first checks whether the actual query results (which contain 105 tuples) 
+is consistent with the expected query results (which contain only 5 tuples).
+As the two results are inconsistent.
+the regression test tool resets the database state and re-executes $T_1$.
+During the re-execution of $T_1$, 
+the test database is in a consistent state.
+As a result, the variable {\tt total} is instantiated with a value ``5''
+and the actual answer returned by the SUT would then be ``$>$ 10 orders''.
+Since the actual answer is inconsistent with the the expected answer,
+the regression tool successfully identifies $T_1$ as a failure test case and 
+no false positives are introduced.
+
+\section{Evaluation}
+   \label{experiment}
+   In this section we report more experiments on the efficiency and test quality of our proposed techniques.
+   In  Section \ref{real}, we report experimental results for a real-life database application.
+   Our proposed techniques perform as well as {\sc slice}, but without 
+   introducing any false positive test cases.
+   In Section \ref{synthetic}, we report more experiments that show {\sc slice*} 
+   outperforms {\sc slice}, especially when there are updates on the test suite.
+   In all of our experiments, if a test case $T$ is deleted from the test suite, {\sc slice*} uses the approach of ``aggressively'' disassembling the corresponding slice
+   because that approach has better performance than the conservative approach in all experiments.
+      
+   \subsection{Real World Case Study}
+    \label{real}
+    
+    The new framework, {\sc safe-optimistic} and {\sc slice*}, were used 
+    by a QA team of a company to test an on-line procurement system throughout the whole product cycle.\footnote{For reasons of confidentially, we do not report the company name here.}
+The procurement system was a Java web application that had been developed under Agile since January 2007.
+The whole project lasted for 10 iterations and each iteration lasted for 2 weeks.
+The test database was a clone of the production database with a size of about 1.5 GB.
+A database reset was about 2 minutes.
+For the purpose of this experiment,
+we requested the QA team to execute tests using the ``brute-force'' approach (BF) and {\sc slice} (based on {\sc optimistic}) in addition to {\sc safe-optimistic} and {\sc slice*}.
+The ``brute-force'' approach was included in the experiment as a baseline to measure the number of false positives during tests.
+The testing platform was a Pentium 1.8 GHz PC with 1 GB main memory running Windows XP.
+The system, backend database (MySQL 4.1), web server (Tomcat 4.1) were installed on the same machine.
+The JDBC driver was MySQL Connector/J.
+The test selection tool was the one used in \cite{icsm05willlmor}.
+
+Initially (at Iteration 1), 
+the test suite consisted of 21 test cases.
+By the 10-th iteration, 
+the system consisted of 1002 Java classes,
+a total of 4 test cases had been deleted, 74 had been added and 15 had been updated.
+The test suite consisted of 91 test cases in the last iteration.
+The shortest test case had 1 database request (a user login) which took around 2 seconds to execute,
+and the longest test case had 22 requests (create an inventory report) which took around 1 minute to execute.
+On average, a test case issued 10 database requests.
+Table \ref{realexp} shows the results of executing the test suite right after the release candidate cut of each iteration.
+
+\begin{table}
+\centering
+\scalebox{0.8}{
+\begin{tabular}{c|c||c|c|c|c|c|c|c|c|c|c|c|}\cline{2-13}
+  & \textbf{Iteration}          &  \textbf{1}    & \textbf{2}   &  \textbf{3}   &  \textbf{4}   &  \textbf{5}   &  \textbf{6}   &  \textbf{7}   &  \textbf{8}   &  \textbf{9}   &  \textbf{10}   &  \textbf{Avg} \\\cline{2-13}\cline{2-13}
+                         & Num of Test Cases  &  21    &  40   &  61   &  84   &  85   &  86   &  86   &  88   &  90   &   91   &  \emph{73.2} \\\hline\hline
+%                         
+\multicolumn{1}{|c|}{ }  & \emph{Failure TCs}  &  6    &  5   &  8   &  8   &  9   &  10   &  7   &  6   &  7   &   5   &  \emph{7.1} \\\cline{2-13}
+\multicolumn{1}{|c|}{BF}  & \emph{DB reset}   &  21    &  40   &  61   &  84   &  85   &  86   &  86   &  88   &  90   &   91   &  \emph{73.2}\\\cline{2-13}
+\multicolumn{1}{|c|}{ }  & \emph{Total Time (min)} &  54    &  99   & 154   &  208  &  212  &  215	& 215	  &  221	&  225	&    228 & \emph{183.1} \\\hline\hline
+%
+\multicolumn{1}{|c|}{ }  & \emph{Failure TCs}  &  5    &  4   &  8   &  8   &  7   &  9   &  7   &  4   &  5   &   4   &  \emph{5.8} \\\cline{2-13}
+\multicolumn{1}{|c|}{{\sc slice}}   & \emph{DB reset}   &  10  &  24  & 28   & 38   & 32   & 24   & 18   &  18  &  18  &  18   & \emph{23.8} \\\cline{2-13}
+\multicolumn{1}{|c|}{ }  & \emph{Total Time (min)}&   31  &  68  & 87   & 118  & 106  & 91  & 79  & 69   &  69  &  69  &    \emph{78.7} \\\hline\hline   
+%
+\multicolumn{1}{|c|}{ }  & \emph{Failure TCs}  &  6    &  5   &  8   &  8   &  9   &  10   &  7   &  6   &  7   &   5   &  \emph{7.1} \\\cline{2-13}
+\multicolumn{1}{|c|}{{\sc slice*}}   & \emph{DB reset}   &  10  &  18  &  20   & 22   & 11   & 7   & 9   &  8  &  7  &  8     & \emph{12} \\\cline{2-13}
+\multicolumn{1}{|c|}{ }  & \emph{Total Time (min)} &  31  &  56  &  71   & 86   & 65   & 57  & 53  &  62 &  61  &  63& \emph{60.5} \\\hline
+\end{tabular}
+}
+\caption{Real World Case Study}
+\label{realexp}
+\end{table}
+
+The brute-force approach was treated as the base case of the study.
+It shuffled the test cases before each test and 
+it restored the database state before each test case started execution.
+The average test execution time was 183 minutes.
+The 10 regression tests triggered 73.2 database restorations on average and there were 7.1 failure test cases on average.
+
+Table \ref{realexp} shows that {\sc slice} 
+(i) sometimes was not able to report all the failure test cases (e.g., Iterations 1,2,5,6) that are reported by the brute-force approach (i.e., with false positives); and
+(ii) it was not able to produce a good test case execution order when there were significant updates on the test suite (e.g., in the first few iterations).
+(iii) Furthermore, even though the test suite became more stable in the later iterations,
+the execution orders devised by {\sc slice}  
+were fairly good.  This was because the conflicts stored in the conflict database were obsolete.
+
+Table \ref{realexp} shows that {\sc slice*} (based on the new testing framework and {\sc safe-optimistic})
+(i) did execute high quality tests because it reported all the failure test cases (i.e., no false positives); and
+(ii) that the number of database resets carried out was smaller than were carried out by {\sc slice}.
+Thus, {\sc slice*} has a better average test execution time than {\sc slice}.
+
+Note that the test execution time of both {\sc slice} and {\sc slice*} reported in Table \ref{realexp} 
+includes the overhead of running the algorithms and of comparing the query results (for {\sc slice*}).
+As those overhead is minimal (usually less than 1 second), we do not report the numbers here.
+
+   \subsection{More Simulation Experiments}
+     \label{synthetic}
+   In addition to the simulation experiments that we presented in Section \ref{drawbackslice}, 
+   we conducted one more set of simulations in order to show the performance of {\sc slice} and {\sc slice*} 
+   when there are updates on the test suite, determining how {\sc slice} and {\sc slice*} perform when there are no update, 20\% update and 40\% update on the test suite over 10 iterations.
+   An $x\%$ update on the test suite is simulated by deleting $x\%$ of test cases from the test suite,
+   and using the test case generator to generate $x\%$ new test cases.
+   
+
+\begin{figure}
+\centering
+\scalebox{0.99}{
+\includegraphics{figures/updating.eps}
+}
+\caption{1000 test cases, 100K conflicts, $x\%$ update ($x = 0\%, 20\%, 40\%$)}
+\label{updating}
+\end{figure}
+   
+   Figure \ref{updating} shows the number of database resets carried out by {\sc slice} and {\sc slice*} in various situations.
+   We can see that the performance of {\sc slice} indeed improves over the ten iterations when they are no updates on the test suite.
+   However, when there are updates on the test suite, 
+   there is less improvement.
+   Especially, when there are many updates (40\% update) on the test suite, {\sc slice} improves little over the ten iterations.
+   {\sc slice*}, in contrast, performs well in all of the same situations, improving most after the second iteration, i.e., after it forms slices from the first iteration.
+   After that, it deals with the update of test cases seamlessly.
+   
+
+\section{Related work}
+   \label{relatedwork}
+    
+
+There has been research work on optimizing the testing time
+(e.g., \cite{tse97rothermel, harrold93,elbaum02} for typical applications 
+and \cite{sac01daou,  icsm05willlmor, ICSE06} for database applications).
+Work has been done on reordering test cases in order to reveal faults earlier (e.g., \cite{rothermel01, 1146240}).
+Recently, \cite{chatterjee04} and \cite{cidr05} both point out that 
+resetting the state of test database is an expensive operation in testing.
+As a result, \cite{chatterjee04} focuses on optimizing that operation 
+and \cite{cidr05} focuses on minimizing the number of that operations.
+\cite{chatterjee04} is orthogonal to our work  because
+the optimized database reset operation is still very time expensive.
+In order to further improve the test execution time,
+\cite{vldb, vldbj} extend \cite{cidr05} to parallel testing,
+where there are multiple machines available for conducting tests in a parallel manner.
+
+\section{Conclusions}
+   \label{conclusions}
+This paper proposes a new test execution strategy called {\sc safe-optimize} and 
+a new test optimization algorithm called {\sc slice*}.
+The {\sc safe-optimize} test execution strategy improves the existing 
+{\sc optimize} test execution strategy, reducing the testing time but without introducing false positive test cases.
+The {\sc slice*} test optimization algorithm improves the existing 
+{\sc slice} test optimization algorithm.
+It has comparable performance without the need to maintain an external conflict database.
+Consequently, {\sc slice*} performs better tham {\sc slice} when the SUT or the test suite are updated during the development cycle.
+Although the proposed techniques are simple,
+experimental results show that test efficiency is improved without jeopardizing test quality.
+That in turns makes the proposed techniques more practical for the industries.
+In the future, we plan to incorporate {\sc optimistic} and {\sc slice*} into the parallel testing framework developed in \cite{vldb, vldbj}.
+
+
+\bibliographystyle{abbrv}
+\bibliography{sigproc}
+
+\end{document}

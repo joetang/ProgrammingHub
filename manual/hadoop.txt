@@ -36,7 +36,7 @@
 		chmod 755 .ssh
 		cat .ssh/id_rsa.pub >> .ssh/authorized_keys
 		chmod 755 .ssh/authorized_keys
-		scp -r .ssh node198:/root/
+		scp -r .ssh node164:/root/
 		scp -r .ssh node181:/root/
 		
 	5. install and configure hadoop (node190)
