@@ -4,16 +4,16 @@
 	[eray]
 	[agile stock]
 	[lime]
+		load mapping
 	[kkbox]
 	[Twidroid]
 	[Profile changer]
 	[ConnectBot]
 	[Barcode Reader]
+	[geo alert]
 	
-	?[apple daily]
 	?[overclocker]
 		set to 256 when sleep
-	?[near location notifier]
 	?[MobileDefense]
 	?[Nesoid]
 
