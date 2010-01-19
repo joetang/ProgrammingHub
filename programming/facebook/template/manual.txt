@@ -11,6 +11,14 @@
 		Connect URL -> the location containing the xd_receiver.htm, e.g. http://192.168.2.12/
 	form action
 		absolute path, otherwise will post to facebook + <path>
+	ensure facebook object init
+		FB.ensureInit(function () {
+			FB.Connect.streamPublish('', attachment);
+		});
+	maintain session
+		$facebook = new Facebook($api_key, $secret);
+		session_id(preg_replace("/[^A-Za-z0-9-]/","",$facebook->api_client->session_key));
+		session_start();
 
 
 
