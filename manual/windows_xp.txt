@@ -1,8 +1,8 @@
 [setup]
 	2 partition (c: d:)
 	updates to latest version
-	[drivers]
-	[folder structure]
+[drivers]
+[folder structure]
 	d:
 	mkdir <user>
 	cd <user>
@@ -57,11 +57,10 @@
 	[diskkeeper]
 	[notepad++]
 	[hideoe]
-	[msn]
-	?[winmerge]
+	[winmerge]
 	[winrar]
 	?[winscp]
 	[screenhunter]
 	?[appserv]
-	[crimson editor]
 	[ant]
+	[msn live messenger]
