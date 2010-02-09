@@ -1,0 +1,1 @@
+java -jar compiler.jar --js=validateTable.js --js_output_file=out.js
