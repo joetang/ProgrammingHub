@@ -1,5 +1,16 @@
+secure
+	?portable windows xp
 	eclipse
 	keepass
 	putty
+	winmerge portable
+	tortoisesvn protable
+	tomcat
+	?appserv
 	?svn
+	?portable git
+	chrome
+	
+	
+public
 	
