@@ -1,2 +1,11 @@
-backup .ssh/ssh_rsa
-backup <user>
+google contacts
+	
+google docs
+	
+tomcat
+
+mysql
+
+financial
+	
+projects
