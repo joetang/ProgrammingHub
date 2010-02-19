@@ -1,5 +1,6 @@
-secure
+uch secure
 	?portable windows xp
+	vnc
 	eclipse
 	keepass
 	putty

@@ -59,6 +59,10 @@
 	[hideoe]
 	[winmerge]
 	[winrar]
+		general
+			archive format: zip
+			compression method: best
+			test archived files: true
 	?[winscp]
 	[screenhunter]
 	?[appserv]
